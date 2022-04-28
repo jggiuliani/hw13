@@ -1,4 +1,4 @@
-'HW 13 Dictionary Attach Josh Sapirstein Joe Giuliani'
+'HW 13 Dictionary Attack Josh Sapirstein Joe Giuliani'
 'Created: 4/27/22'
 'Last Modified: 4/27/22'
 #############################################################################################################################
