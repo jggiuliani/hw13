@@ -1,20 +1,20 @@
-1 cap
-2 tonight
-3 wallet
-4 drink
-5 giraffe
-6 slime
-7 write
-8 otherwise
-9 key
-10 turn
-11 purple
-12 great
-13 cow
-14 seven
-15 pull
-16 zebra
-17 glasses
-18 cried
-19 slammed
-20 beautiful
+cap
+tonight
+wallet
+drink
+giraffe
+slime
+write
+otherwise
+key
+turn
+purple
+great
+cow
+seven
+pull
+zebra
+glasses
+cried
+slammed
+beautiful
