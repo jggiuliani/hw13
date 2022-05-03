@@ -25,6 +25,22 @@ def readDictionary(fileName: str) -> dict:
                 ret[len_word] = [word]
     
     return ret
+            
+# Prompts the user for a password made up of 1-4 words from the dictionary
+def promptUserForPassword():
+    password = ""
+    quantity = int(input("How many words are going to be within your password (1-4): "))
+    count = 0
+
+    while (count < quantity):
+        word = input("Enter in the words for your password, return after each word\n")
+        while (word not in dictionary):
+            print("Word is invalid, try again\n")
+            word = input("Enter in the word for your password: ")
+        password += word
+        count += 1
+
+    return password
 
 # Hashes a string using SHA256  
 def hashSHA256(data: str):
@@ -70,6 +86,7 @@ def endOfRepitition(start: int, arr: list):
 # Stores all strings found in x in out
 # Assumes x is either 1) a string or 2) iterable and contains only iterable and string types
 def extractStrings(x, out: list):
+    
     if type(x) == str:
         out.append(x)
         return
@@ -93,73 +110,49 @@ def wordCombos(lengths: list) -> list:
             ret = combo
         else:
             ret = list(product(ret, combo))
-
+    
     return ret
 
 ## Driver code
 
 dictionary = readDictionary("words500.txt")
 
-userPasses = []
+password = "the"
+passwordLength = len(password)
+passwordSHA256 = hashSHA256(password)
+passwordSHA512 = hashSHA512(password)
 
-while True:
+startTime = time.perf_counter()
 
-    # Assumes user enters password using words from dictionary file
-    userInput = input("Enter password: ")
-    if userInput == "q":
+potentialPasswords = []
+
+# Generate a list of combinations of available word lengths from the dictionary whose
+# sums equal the password length
+lengthCombos = sumCombos(dictionary.keys(), passwordLength)
+
+for lengthCombo in lengthCombos:
+
+    # Generates word combinations based on the word length combination 
+    for wordCombo in wordCombos(lengthCombo):
+        
+        # Creates a list of purely strings out of those in wordCombo
+        words = []
+        extractStrings(wordCombo, words)
+
+        # Converts the permutations of wordCombo to single strings and them to potential passwords
+        for permu in set(permutations(words, len(words))):
+            potentialPasswords.append("".join(permu))
+
+print("Calculation of potential passwords took: ", time.perf_counter()-startTime, "seconds")
+
+startTime = time.perf_counter()
+for p in potentialPasswords:
+    if hashSHA256(p) == passwordSHA256:
         break
+print("User's password's SHA256 hash found in", time.perf_counter()-startTime, "seconds")
 
-    userPass = userInput
-    userPasses.append(userPass)
-    passLen = len(userPass)
-    userSHA256 = hashSHA256(userPass)
-    userSHA512 = hashSHA512(userPass)
-
-    print("SHA256:", userSHA256)
-    print("SHA512:", userSHA512)
-    print()
-
-    startTime = time.perf_counter()
-
-    potentialPasses = []
-
-    # Generate a list of combinations of available word lengths from the dictionary whose
-    # sums equal the password length
-    lengthCombos = sumCombos(dictionary.keys(), passLen)
-
-    for lengthCombo in lengthCombos:
-
-        # Generates word combinations based on the word length combination 
-        for wordCombo in wordCombos(lengthCombo):
-            
-            # Creates a list of purely strings out of those in wordCombo
-            words = []
-            extractStrings(wordCombo, words)
-
-            # Converts the permutations of wordCombo to single strings and them to potential passwords
-            for permu in set(permutations(words, len(words))):
-                potentialPasses.append("".join(permu))
-
-    print("Calculated potential passwords in: ", time.perf_counter()-startTime, "seconds")
-
-    hashFound = False
-    startTime = time.perf_counter()
-    for p in potentialPasses:
-        if hashSHA256(p) == userSHA256:
-            print("SHA256 found in", time.perf_counter()-startTime, "seconds:", p)
-            hashFound = True
-            break
-
-    if not hashFound:
-        print ("SHA256 not found!")
-
-    hashFound = False
-    startTime = time.perf_counter()
-    for p in potentialPasses:
-        if hashSHA512(p) == userSHA512:
-            print("SHA512 found in", time.perf_counter()-startTime, "seconds:", p)
-            hashFound = True
-            break
-
-    if not hashFound:
-        print ("SHA512 not found!")
+startTime = time.perf_counter()
+for p in potentialPasswords:
+    if hashSHA512(p) == passwordSHA512:
+        break
+print("User's password's SHA512 hash found in", time.perf_counter()-startTime, "seconds")
