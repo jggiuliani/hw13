@@ -183,7 +183,7 @@ fig.suptitle("500-word dictionary", fontsize=14)
 ax1 = plt.subplot(321)
 plt.scatter(userPasses, passesCalcTimes)
 plt.xlabel("Password")
-plt.ylabel("Potential Passwords Calculation Time in Seconds")
+plt.ylabel("Passwords Calculation Time in Seconds")
 # Removes scientific notation
 ax1.xaxis.get_offset_text().set_visible(False)
 ax1.yaxis.get_offset_text().set_visible(False)
