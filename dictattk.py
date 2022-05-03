@@ -7,8 +7,8 @@
 import hashlib
 import time
 from itertools import permutations, product, combinations_with_replacement
-import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 #############################################################################################################################
 
 ##Functions for the use of the program
@@ -102,11 +102,15 @@ def wordCombos(lengths: list) -> list:
 
 dictionary = readDictionary("words500.txt")
 
+# Statistics containers
 userPasses       = []
 passesCalcTimes  = []
 SHA256MatchTimes = []
 SHA512MatchTimes = []
+SHA256NumGuesses = []
+SHA512NumGuesses = []
 
+# Begin user input
 while True:
 
     # Assumes user enters password using words from dictionary file
@@ -150,33 +154,66 @@ while True:
     print("Calculated potential passwords in: ", duration, "seconds")
 
     startTime = time.perf_counter()
-    for p in potentialPasses:
-        if hashSHA256(p) == userSHA256:
+    for i in range(len(potentialPasses)):
+        if hashSHA256(potentialPasses[i]) == userSHA256:
             duration = time.perf_counter()-startTime
             SHA256MatchTimes.append(duration)
-            print("SHA256 found in", duration, "seconds:", p)
+            SHA256NumGuesses.append(i+1)
+            print("SHA256 found in", duration, "seconds:", potentialPasses[i])
             break
 
     startTime = time.perf_counter()
-    for p in potentialPasses:
-        if hashSHA512(p) == userSHA512:
+    for i in range(len(potentialPasses)):
+        if hashSHA512(potentialPasses[i]) == userSHA512:
             duration = time.perf_counter()-startTime
             SHA512MatchTimes.append(duration)
-            print("SHA512 found in", duration, "seconds:", p)
+            SHA512NumGuesses.append(i+1)
+            print("SHA512 found in", duration, "seconds:", potentialPasses[i])
             break
 
-# Plot data with x axis as password, y axis as match and calc times
+    print()
+
+# End user input
+
+# Plot program statistics
+
+fig = plt.figure()
+fig.suptitle("500-word dictionary", fontsize=14)
+
+ax1 = plt.subplot(321)
 plt.scatter(userPasses, passesCalcTimes)
 plt.xlabel("Password")
 plt.ylabel("Potential Passwords Calculation Time in Seconds")
-plt.show()
+# Removes scientific notation
+ax1.xaxis.get_offset_text().set_visible(False)
+ax1.yaxis.get_offset_text().set_visible(False)
 
+ax2 = plt.subplot(322)
 plt.scatter(userPasses, SHA256MatchTimes)
 plt.xlabel("Password")
 plt.ylabel("SHA256 Crack Time in Seconds")
-plt.show()
+ax2.xaxis.get_offset_text().set_visible(False)
+ax2.yaxis.get_offset_text().set_visible(False)
 
+ax3 = plt.subplot(323)
 plt.scatter(userPasses, SHA512MatchTimes)
 plt.xlabel("Password")
 plt.ylabel("SHA512 Crack Time in Seconds")
+ax3.xaxis.get_offset_text().set_visible(False)
+ax3.yaxis.get_offset_text().set_visible(False)
+
+ax4 = plt.subplot(324)
+plt.scatter(userPasses, SHA256NumGuesses)
+plt.xlabel("Password")
+plt.ylabel("SHA256 Number of Guesses")
+ax4.xaxis.get_offset_text().set_visible(False)
+ax4.yaxis.get_offset_text().set_visible(False)
+
+ax5 = plt.subplot(325)
+plt.scatter(userPasses, SHA512NumGuesses)
+plt.xlabel("Password")
+plt.ylabel("SHA512 Number of Guesses")
+ax5.xaxis.get_offset_text().set_visible(False)
+ax5.yaxis.get_offset_text().set_visible(False)
+
 plt.show()
