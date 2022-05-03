@@ -7,6 +7,8 @@
 import hashlib
 import time
 from itertools import permutations, product, combinations_with_replacement
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
 #############################################################################################################################
 
 ##Functions for the use of the program
@@ -100,7 +102,10 @@ def wordCombos(lengths: list) -> list:
 
 dictionary = readDictionary("words500.txt")
 
-userPasses = []
+userPasses       = []
+passesCalcTimes  = []
+SHA256MatchTimes = []
+SHA512MatchTimes = []
 
 while True:
 
@@ -140,26 +145,38 @@ while True:
             for permu in set(permutations(words, len(words))):
                 potentialPasses.append("".join(permu))
 
-    print("Calculated potential passwords in: ", time.perf_counter()-startTime, "seconds")
+    duration = time.perf_counter()-startTime
+    passesCalcTimes.append(duration)
+    print("Calculated potential passwords in: ", duration, "seconds")
 
-    hashFound = False
     startTime = time.perf_counter()
     for p in potentialPasses:
         if hashSHA256(p) == userSHA256:
-            print("SHA256 found in", time.perf_counter()-startTime, "seconds:", p)
-            hashFound = True
+            duration = time.perf_counter()-startTime
+            SHA256MatchTimes.append(duration)
+            print("SHA256 found in", duration, "seconds:", p)
             break
 
-    if not hashFound:
-        print ("SHA256 not found!")
-
-    hashFound = False
     startTime = time.perf_counter()
     for p in potentialPasses:
         if hashSHA512(p) == userSHA512:
-            print("SHA512 found in", time.perf_counter()-startTime, "seconds:", p)
-            hashFound = True
+            duration = time.perf_counter()-startTime
+            SHA512MatchTimes.append(duration)
+            print("SHA512 found in", duration, "seconds:", p)
             break
 
-    if not hashFound:
-        print ("SHA512 not found!")
+# Plot data with x axis as password, y axis as match and calc times
+plt.scatter(userPasses, passesCalcTimes)
+plt.xlabel("Password")
+plt.ylabel("Potential Passwords Calculation Time in Seconds")
+plt.show()
+
+plt.scatter(userPasses, SHA256MatchTimes)
+plt.xlabel("Password")
+plt.ylabel("SHA256 Crack Time in Seconds")
+plt.show()
+
+plt.scatter(userPasses, SHA512MatchTimes)
+plt.xlabel("Password")
+plt.ylabel("SHA512 Crack Time in Seconds")
+plt.show()
